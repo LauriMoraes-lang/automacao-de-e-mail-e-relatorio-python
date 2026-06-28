@@ -1,0 +1,136 @@
+# Automação de Sistemas e Processos com Python
+
+### Desafio:
+
+Todos os dias, o nosso sistema atualiza as vendas do dia anterior.
+O seu trabalho diário, como analista, é enviar um e-mail para a diretoria, assim que começar a trabalhar, com o faturamento e a quantidade de produtos vendidos no dia anterior
+
+E-mail da diretoria: seugmail+diretoria@gmail.com<br>
+Local onde o sistema disponibiliza as vendas do dia anterior: https://drive.google.com/drive/folders/149xknr9JvrlEnhNWO49zPcw0PW5icxga
+
+Para resolver isso, vamos usar o pyautogui, uma biblioteca de automação de comandos do mouse e do teclado
+
+
+Referência do pyautogui: https://pyautogui.readthedocs.io/en/latest/quickstart.html
+
+# vamos precisar instalar
+# pyautogui -> automações
+# pandas -> dados
+# openpyxl -> trabalhar com base de dados em Excel (.xlsx)
+# para instalar: abrir o terminal e rodar: pip install pandas pyautogui openpyxl
+
+# pyautogui.click -> clicar com o mouse
+# pyautogui.write -> escrever um texto
+# pyautogui.press -> aperta 1 tecla
+# pyautogui.hotkey -> combinação de teclas
+
+import pyautogui
+import time
+
+pyautogui.PAUSE = 1
+
+# Passo a Passo do desafio
+# Passo 1: Entrar no sistema da empresa (link da empresa)
+# abrir o chrome
+pyautogui.press("win")
+pyautogui.write("chrome")
+pyautogui.press("enter")
+
+time.sleep(1)
+
+# digitei o link do sistema
+link = "https://drive.google.com/drive/folders/149xknr9JvrlEnhNWO49zPcw0PW5icxga"
+pyautogui.write(link)
+# apertei enter e esperei
+pyautogui.press("enter")
+time.sleep(2)
+
+# Passo 2: Navegar no sistema para encontrar a base de dados
+pyautogui.click(x=-1563, y=421, clicks=2)
+time.sleep(1)
+
+# Passo 3: Exportar a base de dados (baixar o arquivo)
+pyautogui.click(x=-62, y=426)
+pyautogui.click(x=-337, y=513)
+time.sleep(5)
+
+### Vamos agora ler o arquivo baixado para pegar os indicadores
+
+- Faturamento
+- Quantidade de Produtos
+
+import pandas
+
+# Passo 4: Calcular os indicadores (faturamento e quantidade de produtos vendidos)
+# abrir a base de dados
+caminho = r"C:\Users\Administrador\Downloads\Vendas - Dez.xlsx"
+tabela = pandas.read_excel(caminho)
+
+# ver as informações da base de dados
+# pode usar os comandos print ou display para visualizar os dados
+display(tabela)
+# somar o faturamento de todos os produtos = somar a coluna de valor final
+faturamento = tabela["Valor Final"].sum()
+# somar a quantidade de produtos
+qtde_produtos = tabela["Quantidade"].sum()
+
+print(faturamento)
+print(qtde_produtos)
+
+### Vamos agora enviar um e-mail pelo gmail
+
+import pyperclip
+
+# Passo 5: Enviar as informações por e-mail
+#abrir uma nova aba no chrome
+pyautogui.hotkey("ctrl", "t")
+
+# entrar no email
+pyautogui.write("https://mail.google.com/")
+pyautogui.press("enter")
+time.sleep(5)
+
+# clicar no botão escrever o e-mail
+pyautogui.click(x=-1836, y=187)
+time.sleep(5)
+
+# para quem enviar o e-mail
+pyautogui.write("e-mail@gmail.com")
+pyautogui.press("tab") # selecionar o e-mail do destinatário
+pyautogui.press("tab") # passar para o campo do assunto do e-mail
+
+# qual o assunto do e-mail
+pyperclip.copy("Relatório de Vendas")
+pyautogui.hotkey("ctrl", "v")
+pyautogui.press("tab")
+
+# qual o conteúdo do e-mail
+texto = f""""
+Prezados,
+
+Segue o Relatório de Vendas de hoje.
+
+Faturamento: {faturamento:,.2f}
+Quantidade de produtos vendidos: {qtde_produtos:,.}
+
+Qualquer dúvida estou à disposição.
+Abs,
+
+Lauri Moraes
+"""
+pyperclip.copy(texto)
+pyautogui.hotkey("ctrl", "v")
+
+pyautogui.write(texto)
+
+# enviar o e-mail
+pyautogui.click(x=-607, y=996)
+
+#### Use esse código para descobrir qual a posição de um item que queira clicar
+
+- Lembre-se: a posição na sua tela é diferente da posição na minha tela
+
+time.sleep(5)
+print(pyautogui.position())
+
+Point(x=-607, y=996)
